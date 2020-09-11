@@ -20,7 +20,7 @@ class Media(object):
         self.media_dist_directory = self.CONFIG['media_dist_directory']
 
     def get_media_from_paths(self, post_path):
-        #Убираем последний слеш /
+        #deleting last slash \
         try:
             src_files = os.listdir(post_path['src_path'][:-1])
             src_medias = list(filter(self.media_filter, src_files))
@@ -39,7 +39,6 @@ class Media(object):
                 
         return [src_medias, dst_medias, src_images]
 
-    #TODO: буферизация в json
     def get_media_paths(self):
         categories = os.listdir(self.posts_path)
 
@@ -61,7 +60,7 @@ class Media(object):
                             'dst_path': self.posts_path.replace('\\_posts', '') + '/' + self.media_dist_directory + '/' + cat_path + '/' + year + '/' + folder_name + '/'
                         }
                         data.append(post_path)
-
+        
         self.media_data_paths = data
         return data
 
@@ -100,7 +99,7 @@ class Media(object):
             data = self.media_data_paths
 
         for post in data:
-            #Проверяем: конвертированы ли файлы внутри, если да, то пропускаем итерацию
+            #Checking: if files already converted, then skipping iteration
             if self.are_files_converted(post):
                 continue
 
@@ -111,7 +110,7 @@ class Media(object):
             data = self.media_data_paths
 
         for post in data:
-            #Проверяем: перемещены ли файлы в релиз, если да, то пропускаем итерацию
+            #Checking: if files already moved into release, then skip iteration
             if self.are_files_released(post):
                 continue
 
@@ -162,7 +161,16 @@ class Media(object):
 
 
 if __name__ == "__main__":
-    obj = Media()
-    obj.get_media_paths()
-    obj.convert_all_images(None)
-    obj.release_media_files(None)
+    print('Start executing program')
+    try:
+        obj = Media()
+        print('Getting all medias in posts')
+        obj.get_media_paths()
+        print('Converting all medias in posts')
+        obj.convert_all_images(None)
+        print('Moving all medias from posts to distanation dir')
+        obj.release_media_files(None)
+    except:
+        print('Check error log. Program crashed.')
+    print('Program successful completed')
+
