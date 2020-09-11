@@ -24,9 +24,11 @@ class Media(object):
         try:
             src_files = os.listdir(post_path['src_path'][:-1])
             src_medias = list(filter(self.media_filter, src_files))
+            src_images = list(filter(self.image_filter, src_files))
         except:
             self.error_log('Can\'t find source dir')
             src_medias = None
+            src_images = None
         
         try:
             dst_files = os.listdir(post_path['dst_path'][:-1])
@@ -35,7 +37,7 @@ class Media(object):
             self.error_log('Can\'t find distanation dir for comparing media files')
             dst_medias = None     
                 
-        return [src_medias, dst_medias]
+        return [src_medias, dst_medias, src_images]
 
     #TODO: буферизация в json
     def get_media_paths(self):
@@ -64,9 +66,12 @@ class Media(object):
         return data
 
     def are_files_converted(self, post):
-        media = self.get_media_from_paths(post)[0]
-        jpg = list(filter(lambda x: x.endswith('.webp'), media))
-        if jpg:
+        images_without_webp = list(filter(lambda x: not x.endswith('.webp') and re.match(r'^\d{1,2}t?p?\.', x), self.get_media_from_paths(post)[2]))
+        images_without_webp = [el.split('.')[0] for el in images_without_webp]
+        images_with_webp = list(filter(lambda x: x.endswith('.webp')  and re.match(r'^\d{1,2}t?p?\.', x), self.get_media_from_paths(post)[2]))
+        images_with_webp = [el.split('.')[0] for el in images_with_webp]
+
+        if images_without_webp == images_with_webp:
             return True
         return False
 
@@ -79,7 +84,7 @@ class Media(object):
         create_error_log(msg)
 
     def convert_2_webp(self, post):
-        medias = self.get_media_from_paths(post)[0]
+        medias = self.get_media_from_paths(post)[2]
         for file in medias:
             try:
                 image = Image.open(post['src_path'] + file)
@@ -136,7 +141,7 @@ class Media(object):
             return None
         
         if re.match(r'^\d{1,2}t?p?\.', string): # equal to "[0-99]" + "('' || 't' || 'p')" + "."
-            for image_format in self.image_formats:
+            for image_format in list(set(self.image_formats) - set('.webp')):
                 if image_format in string:
                     return 1
             return 0
