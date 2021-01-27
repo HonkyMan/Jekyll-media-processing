@@ -1,12 +1,12 @@
 import json
 
 default_config = {
-    'posts_path': '<path_to_media_dir_inside_posts_folder>', 
-    'media_directory': '<_backstage>',
-    'media_dist_directory': '<images>',
+    'posts_path': 'D:\\Glimake\\scartProject\\www\\scartproject\\_posts', #'<path_to_media_dir_inside_posts_folder>', 
+    'media_directory': '_backstage',
+    'media_dist_directory': 'images',
     'media_formats': {
         'images': [
-            '.jpg', '.png', '.webp', '.jpeg', '.gif'
+            '.jpg', '.webp', '.gif' #, '.png', '.jpeg'
         ],
         'videos': [
             '.mp4'

@@ -19,6 +19,8 @@ class Media(object):
         self.media_directory = self.CONFIG['media_directory']
         self.media_dist_directory = self.CONFIG['media_dist_directory']
 
+        self.webp_format = '.webp'
+
     def get_media_from_paths(self, post_path):
         #deleting last slash \
         try:
@@ -65,9 +67,10 @@ class Media(object):
         return data
 
     def are_files_converted(self, post):
-        images_without_webp = list(filter(lambda x: not x.endswith('.webp') and re.match(r'^\d{1,2}t?p?\.', x), self.get_media_from_paths(post)[2]))
+
+        images_without_webp = list(filter(lambda x: not x.endswith(self.webp_format) and re.match(r'^\d{1,2}t?p?\.', x), self.get_media_from_paths(post)[2]))
         images_without_webp = [el.split('.')[0] for el in images_without_webp]
-        images_with_webp = list(filter(lambda x: x.endswith('.webp')  and re.match(r'^\d{1,2}t?p?\.', x), self.get_media_from_paths(post)[2]))
+        images_with_webp = list(filter(lambda x: x.endswith(self.webp_format)  and re.match(r'^\d{1,2}t?p?\.', x), self.get_media_from_paths(post)[2]))
         images_with_webp = [el.split('.')[0] for el in images_with_webp]
 
         if images_without_webp == images_with_webp:
@@ -88,11 +91,11 @@ class Media(object):
             try:
                 image = Image.open(post['src_path'] + file)
                 image = image.convert('RGB')
-                image.save((post['src_path'] + file).rsplit('.', 1)[0] + '.webp', 'webp')
+                image.save((post['src_path'] + file).rsplit('.', 1)[0] + self.webp_format, 'webp')
 
             except Exception as e:
                 print(e)     
-                self.error_log(str(e) + 'Can\'t convert images to .webp')
+                self.error_log(str(e) + 'Can\'t convert images to' + self.webp_format)
 
     def convert_all_images(self, data):
         if not data:
@@ -140,7 +143,7 @@ class Media(object):
             return None
         
         if re.match(r'^\d{1,2}t?p?\.', string): # equal to "[0-99]" + "('' || 't' || 'p')" + "."
-            for image_format in list(set(self.image_formats) - set('.webp')):
+            for image_format in list(set(self.image_formats) - set(self.webp_format)):
                 if image_format in string:
                     return 1
             return 0
